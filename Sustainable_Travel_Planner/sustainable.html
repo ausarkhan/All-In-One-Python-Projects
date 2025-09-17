@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sustainable Travel Planner</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .container { max-width: 600px; margin: auto; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+        th { background: #e0f7fa; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>Sustainable Travel Planner</h2>
+    <p>Discover eco-friendly destinations and activities to reduce your carbon footprint and support local communities.</p>
+    <table>
+        <thead>
+            <tr>
+                <th>Destination</th>
+                <th>Activity</th>
+                <th>Eco Score</th>
+            </tr>
+        </thead>
+        <tbody id="suggestionTable"></tbody>
+    </table>
+</div>
+<script>
+function fetchSuggestions() {
+    fetch('/api/suggestions').then(r => r.json()).then(data => {
+        const table = document.getElementById('suggestionTable');
+        table.innerHTML = '';
+        data.forEach(s => {
+            const row = `<tr><td>${s.destination}</td><td>${s.activity}</td><td>${s.eco_score}/10</td></tr>`;
+            table.innerHTML += row;
+        });
+    });
+}
+fetchSuggestions();
+</script>
+</body>
+</html>
