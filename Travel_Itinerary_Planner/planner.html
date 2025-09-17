@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Travel Itinerary Planner</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .container { max-width: 700px; margin: auto; }
+        input, button, textarea { margin: 5px; }
+        textarea { width: 100%; height: 60px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>Travel Itinerary Planner</h2>
+    <div>
+        <label>Trip Name: </label>
+        <input type="text" id="tripName" />
+    </div>
+    <div>
+        <label>Places to Visit (comma separated): </label>
+        <input type="text" id="places" />
+    </div>
+    <div>
+        <label>Accommodations: </label>
+        <input type="text" id="accommodations" />
+    </div>
+    <div>
+        <label>Activities: </label>
+        <textarea id="activities"></textarea>
+    </div>
+    <button onclick="addItinerary()">Save Itinerary</button>
+    <h3>Saved Itineraries</h3>
+    <ul id="itineraryList"></ul>
+    <h3>Map Preview</h3>
+    <iframe id="mapFrame" width="600" height="400" style="border:0" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+</div>
+<script>
+function addItinerary() {
+    const trip = {
+        name: document.getElementById('tripName').value,
+        places: document.getElementById('places').value.split(','),
+        accommodations: document.getElementById('accommodations').value,
+        activities: document.getElementById('activities').value
+    };
+    fetch('/api/itineraries', {
+        method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(trip)
+    }).then(fetchItineraries);
+}
+function fetchItineraries() {
+    fetch('/api/itineraries').then(r => r.json()).then(data => {
+        const list = document.getElementById('itineraryList');
+        list.innerHTML = '';
+        data.forEach((it, idx) => {
+            const li = document.createElement('li');
+            li.innerHTML = `<b>${it.name}</b>: Places - ${it.places.join(', ')}, Accommodations - ${it.accommodations}, Activities - ${it.activities} <button onclick='showMap(${idx})'>Show Map</button>`;
+            list.appendChild(li);
+        });
+    });
+}
+function showMap(idx) {
+    fetch('/api/itineraries').then(r => r.json()).then(data => {
+        const places = data[idx].places.map(p => encodeURIComponent(p.trim())).join('%2C');
+        const url = `https://www.google.com/maps/embed/v1/search?key=YOUR_API_KEY&q=${places}`;
+        document.getElementById('mapFrame').src = url;
+    });
+}
+fetchItineraries();
+</script>
+</body>
+</html>
