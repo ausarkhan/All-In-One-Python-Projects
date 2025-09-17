@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Personal Finance Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .container { max-width: 600px; margin: auto; }
+        input, button { margin: 5px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>Personal Finance Dashboard</h2>
+    <div>
+        <label>Set Budget: </label>
+        <input type="number" id="budgetInput" />
+        <button onclick="setBudget()">Set</button>
+        <span id="budgetDisplay"></span>
+    </div>
+    <div>
+        <label>Add Expense: </label>
+        <input type="text" id="expenseName" placeholder="Name" />
+        <input type="number" id="expenseAmount" placeholder="Amount" />
+        <button onclick="addExpense()">Add</button>
+    </div>
+    <canvas id="expenseChart" width="400" height="200"></canvas>
+</div>
+<script>
+let expenses = [];
+let budget = 0;
+const chartCtx = document.getElementById('expenseChart').getContext('2d');
+let chart;
+
+function fetchBudget() {
+    fetch('/api/budget').then(r => r.json()).then(data => {
+        budget = data.budget;
+        document.getElementById('budgetDisplay').innerText = `Budget: $${budget}`;
+    });
+}
+function setBudget() {
+    const val = Number(document.getElementById('budgetInput').value);
+    fetch('/api/budget', {
+        method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({budget: val})
+    }).then(fetchBudget);
+}
+function fetchExpenses() {
+    fetch('/api/expenses').then(r => r.json()).then(data => {
+        expenses = data;
+        updateChart();
+    });
+}
+function addExpense() {
+    const name = document.getElementById('expenseName').value;
+    const amount = Number(document.getElementById('expenseAmount').value);
+    fetch('/api/expenses', {
+        method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({name, amount})
+    }).then(fetchExpenses);
+}
+function updateChart() {
+    const labels = expenses.map(e => e.name);
+    const data = expenses.map(e => e.amount);
+    if (chart) chart.destroy();
+    chart = new Chart(chartCtx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{ label: 'Expenses', data: data, backgroundColor: '#4caf50' }]
+        },
+        options: {
+            plugins: {
+                title: { display: true, text: `Budget: $${budget} | Total Spent: $${data.reduce((a,b)=>a+b,0)}` }
+            }
+        }
+    });
+}
+fetchBudget();
+fetchExpenses();
+</script>
+</body>
+</html>
