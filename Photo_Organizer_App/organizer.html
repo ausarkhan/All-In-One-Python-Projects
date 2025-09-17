@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Photo Organizer App</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .container { max-width: 700px; margin: auto; }
+        input, button { margin: 5px; }
+        img { max-width: 150px; margin: 5px; border: 1px solid #ccc; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>Photo Organizer App</h2>
+    <form id="uploadForm" enctype="multipart/form-data">
+        <input type="file" name="photo" required />
+        <input type="text" name="tags" placeholder="Tags (comma separated)" />
+        <button type="submit">Upload</button>
+    </form>
+    <div>
+        <label>Search by Tag:</label>
+        <input type="text" id="searchTag" />
+        <label>Search by Date:</label>
+        <input type="date" id="searchDate" />
+        <button onclick="searchPhotos()">Search</button>
+    </div>
+    <div id="photoGallery"></div>
+</div>
+<script>
+document.getElementById('uploadForm').onsubmit = function(e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+    fetch('/api/upload', { method: 'POST', body: formData })
+        .then(() => searchPhotos());
+};
+function searchPhotos() {
+    const tag = document.getElementById('searchTag').value;
+    const date = document.getElementById('searchDate').value;
+    let url = '/api/photos?';
+    if (tag) url += `tag=${tag}&`;
+    if (date) url += `date=${date}`;
+    fetch(url).then(r => r.json()).then(data => {
+        const gallery = document.getElementById('photoGallery');
+        gallery.innerHTML = '';
+        data.forEach(p => {
+            gallery.innerHTML += `<div><img src='/photos/${p.filename}' /><br/>Tags: ${p.tags.join(', ')}<br/>Date: ${p.date}</div>`;
+        });
+    });
+}
+searchPhotos();
+</script>
+</body>
+</html>
