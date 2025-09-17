@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Language Learning Chatbot</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .container { max-width: 600px; margin: auto; }
+        #chat { border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: auto; margin-bottom: 10px; }
+        input, button { margin: 5px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>Language Learning Chatbot</h2>
+    <div id="chat"></div>
+    <input type="text" id="userInput" placeholder="Type your message..." />
+    <button onclick="sendMessage()">Send</button>
+</div>
+<script>
+function appendMessage(sender, text) {
+    const chat = document.getElementById('chat');
+    chat.innerHTML += `<b>${sender}:</b> ${text}<br/>`;
+    chat.scrollTop = chat.scrollHeight;
+}
+function sendMessage() {
+    const input = document.getElementById('userInput');
+    const msg = input.value;
+    if (!msg) return;
+    appendMessage('You', msg);
+    input.value = '';
+    fetch('/api/chat', {
+        method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({message: msg})
+    }).then(r => r.json()).then(data => {
+        appendMessage('AI', data.reply);
+    });
+}
+</script>
+</body>
+</html>
