@@ -24,6 +24,19 @@ _All-In-One-Python-Projects is a collection of all scripts starting from very ba
 ## Getting Started
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
 
+### For Contributors: Fork Management Tools
+
+If you've forked this repository, we've provided tools to help you manage your contributions:
+
+- **📊 `analyze_repo.py`** - Analyze your repository and see what projects you've added
+- **📖 `FORK_MANAGEMENT_GUIDE.md`** - Comprehensive guide for managing your fork
+- **🎯 `REPOSITORY_ANALYSIS.md`** - Analysis results and recommendations
+
+Run the analysis tool to see your contributions:
+```bash
+python3 analyze_repo.py
+```
+
 ## Prerequisites
 - Python 3.x
 
